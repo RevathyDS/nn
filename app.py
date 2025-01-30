@@ -1,7 +1,8 @@
 import os
+import re
 import streamlit as st
 from langchain.chat_models import ChatOllama
-from langchain.schema import AIMessage, HumanMessage
+from langchain.schema import HumanMessage
 
 # Use Ollama with DeepSeek
 llm = ChatOllama(model="deepseek-r1:1.5b", base_url="http://127.0.0.1:11434",keep_alive=True)
@@ -28,8 +29,15 @@ if user_input:
     # Get response from DeepSeek via Ollama
     response = llm.invoke([HumanMessage(content=user_input)])
 
-    # Store response
-    st.session_state.messages.append({"role": "assistant", "content": response.content})
+    # Extract content from the response by removing <think></think> tags
+    response_content = response.content
 
-    # Show response
-    st.text_area("Assistant:", response.content, disabled=True)
+    # Use regex to remove the <think></think> wrapper
+    cleaned_response = re.sub(r'<think>.*?</think>', '', response_content).strip()
+
+    # Store cleaned response
+    st.session_state.messages.append({"role": "assistant", "content": cleaned_response})
+
+    # Show cleaned response
+    st.text_area("Assistant:", cleaned_response, disabled=True)
+
