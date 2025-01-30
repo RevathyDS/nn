@@ -7,6 +7,7 @@ from langchain.schema import HumanMessage
 # Use Ollama with DeepSeek
 llm = ChatOllama(model="deepseek-r1:1.5b", base_url="http://127.0.0.1:11434",keep_alive=True)
 
+
 # Streamlit Chat UI
 st.title("🤖 Kaggle Chatbot with Ollama & DeepSeek")
 
@@ -29,15 +30,18 @@ if user_input:
     # Get response from DeepSeek via Ollama
     response = llm.invoke([HumanMessage(content=user_input)])
 
-    # Extract content from the response by removing <think></think> tags
+    # Extract content from the response and clean up
     response_content = response.content
+    
+    # Use regex to remove all instances of <think></think> and any content between them
+    cleaned_response = re.sub(r'<think>.*?</think>', '', response_content, flags=re.DOTALL).strip()
 
-    # Use regex to remove the <think></think> wrapper
-    cleaned_response = re.sub(r'<think>.*?</think>', '', response_content).strip()
+    # Ensure the cleaned response isn't empty
+    if not cleaned_response:
+        cleaned_response = "I'm sorry, I couldn't understand that."
 
     # Store cleaned response
     st.session_state.messages.append({"role": "assistant", "content": cleaned_response})
 
     # Show cleaned response
     st.text_area("Assistant:", cleaned_response, disabled=True)
-
