@@ -4,7 +4,7 @@ from langchain.chat_models import ChatOllama
 from langchain.schema import AIMessage, HumanMessage
 
 # Use Ollama with DeepSeek
-llm = ChatOllama(model="deepseek-r1:1.5b")
+llm = ChatOllama(model="deepseek-r1:1.5b", base_url="http://127.0.0.1:11434",keep_alive=True)
 
 # Streamlit Chat UI
 st.title("🤖 Kaggle Chatbot with Ollama & DeepSeek")
